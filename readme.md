@@ -1,0 +1,1 @@
+﻿Toy Java OO example project for teaching.
