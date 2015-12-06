@@ -1,0 +1,165 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Created on Mar 27, 2008<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with<a name="line.4"></a>
+<FONT color="green">005</FONT>     * the License. You may obtain a copy of the License at<a name="line.5"></a>
+<FONT color="green">006</FONT>     *<a name="line.6"></a>
+<FONT color="green">007</FONT>     * http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
+<FONT color="green">008</FONT>     *<a name="line.8"></a>
+<FONT color="green">009</FONT>     * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on<a name="line.9"></a>
+<FONT color="green">010</FONT>     * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the<a name="line.10"></a>
+<FONT color="green">011</FONT>     * specific language governing permissions and limitations under the License.<a name="line.11"></a>
+<FONT color="green">012</FONT>     *<a name="line.12"></a>
+<FONT color="green">013</FONT>     * Copyright @2008-2010 the original author or authors.<a name="line.13"></a>
+<FONT color="green">014</FONT>     */<a name="line.14"></a>
+<FONT color="green">015</FONT>    package org.fest.swing.listener;<a name="line.15"></a>
+<FONT color="green">016</FONT>    <a name="line.16"></a>
+<FONT color="green">017</FONT>    import static javax.swing.SwingUtilities.invokeLater;<a name="line.17"></a>
+<FONT color="green">018</FONT>    import static javax.swing.SwingUtilities.isEventDispatchThread;<a name="line.18"></a>
+<FONT color="green">019</FONT>    <a name="line.19"></a>
+<FONT color="green">020</FONT>    import java.awt.AWTEvent;<a name="line.20"></a>
+<FONT color="green">021</FONT>    import java.awt.event.AWTEventListener;<a name="line.21"></a>
+<FONT color="green">022</FONT>    import java.util.ArrayList;<a name="line.22"></a>
+<FONT color="green">023</FONT>    import java.util.List;<a name="line.23"></a>
+<FONT color="green">024</FONT>    <a name="line.24"></a>
+<FONT color="green">025</FONT>    import net.jcip.annotations.GuardedBy;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import net.jcip.annotations.ThreadSafe;<a name="line.26"></a>
+<FONT color="green">027</FONT>    <a name="line.27"></a>
+<FONT color="green">028</FONT>    /**<a name="line.28"></a>
+<FONT color="green">029</FONT>     * Understands a &lt;code&gt;{@link AWTEventListener}&lt;/code&gt; that ensures all events are handled on the event dispatch<a name="line.29"></a>
+<FONT color="green">030</FONT>     * thread.<a name="line.30"></a>
+<FONT color="green">031</FONT>     * &lt;p&gt;<a name="line.31"></a>
+<FONT color="green">032</FONT>     * NOTE from Abbot: Applet runners may run several simultaneous event dispatch threads when displaying multiple applets<a name="line.32"></a>
+<FONT color="green">033</FONT>     * simultaneously. If this listener is installed in the parent context of those dispatch threads, it will be invoked on<a name="line.33"></a>
+<FONT color="green">034</FONT>     * each of those threads, possibly simultaneously.<a name="line.34"></a>
+<FONT color="green">035</FONT>     * &lt;/p&gt;<a name="line.35"></a>
+<FONT color="green">036</FONT>     *<a name="line.36"></a>
+<FONT color="green">037</FONT>     * @author Yvonne Wang<a name="line.37"></a>
+<FONT color="green">038</FONT>     * @author Alex Ruiz<a name="line.38"></a>
+<FONT color="green">039</FONT>     */<a name="line.39"></a>
+<FONT color="green">040</FONT>    @ThreadSafe<a name="line.40"></a>
+<FONT color="green">041</FONT>    public abstract class EventDispatchThreadedEventListener implements AWTEventListener {<a name="line.41"></a>
+<FONT color="green">042</FONT>    <a name="line.42"></a>
+<FONT color="green">043</FONT>      @GuardedBy("lock") private final List&lt;AWTEvent&gt; deferredEvents = new ArrayList&lt;AWTEvent&gt;();<a name="line.43"></a>
+<FONT color="green">044</FONT>      private final Object lock = new Object();<a name="line.44"></a>
+<FONT color="green">045</FONT>    <a name="line.45"></a>
+<FONT color="green">046</FONT>      private final Runnable processDeferredEventsTask = new Runnable() {<a name="line.46"></a>
+<FONT color="green">047</FONT>        public void run() {<a name="line.47"></a>
+<FONT color="green">048</FONT>          processDeferredEvents();<a name="line.48"></a>
+<FONT color="green">049</FONT>        }<a name="line.49"></a>
+<FONT color="green">050</FONT>      };<a name="line.50"></a>
+<FONT color="green">051</FONT>    <a name="line.51"></a>
+<FONT color="green">052</FONT>      /**<a name="line.52"></a>
+<FONT color="green">053</FONT>       * If this method is called in the event dispatch thread, it processes the given event and the queued ones. Otherwise<a name="line.53"></a>
+<FONT color="green">054</FONT>       * it will add the given event to the queue and process all the events in the queue in the event dispatch thread.<a name="line.54"></a>
+<FONT color="green">055</FONT>       * @param event the event to process.<a name="line.55"></a>
+<FONT color="green">056</FONT>       */<a name="line.56"></a>
+<FONT color="green">057</FONT>      public void eventDispatched(AWTEvent event) {<a name="line.57"></a>
+<FONT color="green">058</FONT>        if (!isEventDispatchThread()) {<a name="line.58"></a>
+<FONT color="green">059</FONT>          // Often the application under test will invoke Window.show, which spawns hierarchy events. We want to ensure we<a name="line.59"></a>
+<FONT color="green">060</FONT>          // respond to those events on the dispatch thread to avoid deadlock.<a name="line.60"></a>
+<FONT color="green">061</FONT>          synchronized (lock) {<a name="line.61"></a>
+<FONT color="green">062</FONT>            deferredEvents.add(event);<a name="line.62"></a>
+<FONT color="green">063</FONT>          }<a name="line.63"></a>
+<FONT color="green">064</FONT>          // Ensure that in the absence of any subsequent event thread events deferred events still get processed.<a name="line.64"></a>
+<FONT color="green">065</FONT>          // If regular events are received before this action is run, the deferred events will be processed prior to those<a name="line.65"></a>
+<FONT color="green">066</FONT>          // events and the action will do nothing.<a name="line.66"></a>
+<FONT color="green">067</FONT>          invokeLater(processDeferredEventsTask);<a name="line.67"></a>
+<FONT color="green">068</FONT>          return;<a name="line.68"></a>
+<FONT color="green">069</FONT>        }<a name="line.69"></a>
+<FONT color="green">070</FONT>        // Ensure any deferred events are processed prior to subsequently posted events.<a name="line.70"></a>
+<FONT color="green">071</FONT>        processDeferredEvents();<a name="line.71"></a>
+<FONT color="green">072</FONT>        processEvent(event);<a name="line.72"></a>
+<FONT color="green">073</FONT>      }<a name="line.73"></a>
+<FONT color="green">074</FONT>    <a name="line.74"></a>
+<FONT color="green">075</FONT>      /** Processes any events that were generated off the event queue but not immediately handled. */<a name="line.75"></a>
+<FONT color="green">076</FONT>      protected void processDeferredEvents() {<a name="line.76"></a>
+<FONT color="green">077</FONT>        // Make a copy of the deferred events and empty the queue<a name="line.77"></a>
+<FONT color="green">078</FONT>        List&lt;AWTEvent&gt; queue = new ArrayList&lt;AWTEvent&gt;();<a name="line.78"></a>
+<FONT color="green">079</FONT>        synchronized (lock) {<a name="line.79"></a>
+<FONT color="green">080</FONT>          // In the rare case where there are multiple simultaneous dispatch threads, it's possible for deferred events to<a name="line.80"></a>
+<FONT color="green">081</FONT>          // get posted while another event is being processed. At most this will mean a few events get processed out of<a name="line.81"></a>
+<FONT color="green">082</FONT>          // order, but they will likely be from different event dispatch contexts, so it shouldn't matter.<a name="line.82"></a>
+<FONT color="green">083</FONT>          queue.addAll(deferredEvents);<a name="line.83"></a>
+<FONT color="green">084</FONT>          deferredEvents.clear();<a name="line.84"></a>
+<FONT color="green">085</FONT>        }<a name="line.85"></a>
+<FONT color="green">086</FONT>        while (queue.size() &gt; 0) {<a name="line.86"></a>
+<FONT color="green">087</FONT>          AWTEvent event = queue.get(0);<a name="line.87"></a>
+<FONT color="green">088</FONT>          queue.remove(0);<a name="line.88"></a>
+<FONT color="green">089</FONT>          processEvent(event);<a name="line.89"></a>
+<FONT color="green">090</FONT>        }<a name="line.90"></a>
+<FONT color="green">091</FONT>      }<a name="line.91"></a>
+<FONT color="green">092</FONT>    <a name="line.92"></a>
+<FONT color="green">093</FONT>      /**<a name="line.93"></a>
+<FONT color="green">094</FONT>       * This method is not protected by any synchronization locks (nor should it be); in the presence of multiple<a name="line.94"></a>
+<FONT color="green">095</FONT>       * simultaneous event dispatch threads, the listener must be thread-safe.<a name="line.95"></a>
+<FONT color="green">096</FONT>       * @param event the event to process.<a name="line.96"></a>
+<FONT color="green">097</FONT>       */<a name="line.97"></a>
+<FONT color="green">098</FONT>      protected abstract void processEvent(AWTEvent event);<a name="line.98"></a>
+<FONT color="green">099</FONT>    }<a name="line.99"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

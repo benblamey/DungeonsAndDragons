@@ -1,0 +1,177 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Created on Mar 24, 2008<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except<a name="line.4"></a>
+<FONT color="green">005</FONT>     * in compliance with the License. You may obtain a copy of the License at<a name="line.5"></a>
+<FONT color="green">006</FONT>     *<a name="line.6"></a>
+<FONT color="green">007</FONT>     * http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
+<FONT color="green">008</FONT>     *<a name="line.8"></a>
+<FONT color="green">009</FONT>     * Unless required by applicable law or agreed to in writing, software distributed under the License<a name="line.9"></a>
+<FONT color="green">010</FONT>     * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express<a name="line.10"></a>
+<FONT color="green">011</FONT>     * or implied. See the License for the specific language governing permissions and limitations under<a name="line.11"></a>
+<FONT color="green">012</FONT>     * the License.<a name="line.12"></a>
+<FONT color="green">013</FONT>     *<a name="line.13"></a>
+<FONT color="green">014</FONT>     * Copyright @2008-2010 the original author or authors.<a name="line.14"></a>
+<FONT color="green">015</FONT>     */<a name="line.15"></a>
+<FONT color="green">016</FONT>    package org.fest.swing.util;<a name="line.16"></a>
+<FONT color="green">017</FONT>    <a name="line.17"></a>
+<FONT color="green">018</FONT>    import static java.awt.event.InputEvent.*;<a name="line.18"></a>
+<FONT color="green">019</FONT>    import static java.awt.event.KeyEvent.*;<a name="line.19"></a>
+<FONT color="green">020</FONT>    import static java.lang.String.valueOf;<a name="line.20"></a>
+<FONT color="green">021</FONT>    import static org.fest.util.Strings.concat;<a name="line.21"></a>
+<FONT color="green">022</FONT>    <a name="line.22"></a>
+<FONT color="green">023</FONT>    import java.util.*;<a name="line.23"></a>
+<FONT color="green">024</FONT>    <a name="line.24"></a>
+<FONT color="green">025</FONT>    /**<a name="line.25"></a>
+<FONT color="green">026</FONT>     * Understands utility methods related to input modifiers. This class also maps modifier masks to key codes for the<a name="line.26"></a>
+<FONT color="green">027</FONT>     * following modifiers:<a name="line.27"></a>
+<FONT color="green">028</FONT>     * &lt;ul&gt;<a name="line.28"></a>
+<FONT color="green">029</FONT>     * &lt;li&gt;Alt&lt;/li&gt;<a name="line.29"></a>
+<FONT color="green">030</FONT>     * &lt;li&gt;AltGraph&lt;/li&gt;<a name="line.30"></a>
+<FONT color="green">031</FONT>     * &lt;li&gt;Control&lt;/li&gt;<a name="line.31"></a>
+<FONT color="green">032</FONT>     * &lt;li&gt;Meta&lt;/li&gt;<a name="line.32"></a>
+<FONT color="green">033</FONT>     * &lt;li&gt;Shift&lt;/li&gt;<a name="line.33"></a>
+<FONT color="green">034</FONT>     * &lt;/ul&gt;<a name="line.34"></a>
+<FONT color="green">035</FONT>     *<a name="line.35"></a>
+<FONT color="green">036</FONT>     * @author Yvonne Wang<a name="line.36"></a>
+<FONT color="green">037</FONT>     * @author Alex Ruiz<a name="line.37"></a>
+<FONT color="green">038</FONT>     */<a name="line.38"></a>
+<FONT color="green">039</FONT>    public final class Modifiers {<a name="line.39"></a>
+<FONT color="green">040</FONT>    <a name="line.40"></a>
+<FONT color="green">041</FONT>      private static final Map&lt;Integer, Integer&gt; MODIFIER_TO_KEY = new LinkedHashMap&lt;Integer, Integer&gt;();<a name="line.41"></a>
+<FONT color="green">042</FONT>      private static final Map&lt;Integer, Integer&gt; KEY_TO_MODIFIER = new LinkedHashMap&lt;Integer, Integer&gt;();<a name="line.42"></a>
+<FONT color="green">043</FONT>    <a name="line.43"></a>
+<FONT color="green">044</FONT>      static {<a name="line.44"></a>
+<FONT color="green">045</FONT>        MODIFIER_TO_KEY.put(ALT_GRAPH_MASK, VK_ALT_GRAPH);<a name="line.45"></a>
+<FONT color="green">046</FONT>        KEY_TO_MODIFIER.put(VK_ALT_GRAPH, ALT_GRAPH_MASK);<a name="line.46"></a>
+<FONT color="green">047</FONT>        MODIFIER_TO_KEY.put(ALT_MASK, VK_ALT);<a name="line.47"></a>
+<FONT color="green">048</FONT>        KEY_TO_MODIFIER.put(VK_ALT, ALT_MASK);<a name="line.48"></a>
+<FONT color="green">049</FONT>        MODIFIER_TO_KEY.put(SHIFT_MASK, VK_SHIFT);<a name="line.49"></a>
+<FONT color="green">050</FONT>        KEY_TO_MODIFIER.put(VK_SHIFT, SHIFT_MASK);<a name="line.50"></a>
+<FONT color="green">051</FONT>        MODIFIER_TO_KEY.put(CTRL_MASK, VK_CONTROL);<a name="line.51"></a>
+<FONT color="green">052</FONT>        KEY_TO_MODIFIER.put(VK_CONTROL, CTRL_MASK);<a name="line.52"></a>
+<FONT color="green">053</FONT>        MODIFIER_TO_KEY.put(META_MASK, VK_META);<a name="line.53"></a>
+<FONT color="green">054</FONT>        KEY_TO_MODIFIER.put(VK_META, META_MASK);<a name="line.54"></a>
+<FONT color="green">055</FONT>      }<a name="line.55"></a>
+<FONT color="green">056</FONT>    <a name="line.56"></a>
+<FONT color="green">057</FONT>      /**<a name="line.57"></a>
+<FONT color="green">058</FONT>       * Returns the key codes for the given modifier mask.<a name="line.58"></a>
+<FONT color="green">059</FONT>       * @param modifierMask the given modifier mask.<a name="line.59"></a>
+<FONT color="green">060</FONT>       * @return the key codes for the given modifier mask.<a name="line.60"></a>
+<FONT color="green">061</FONT>       */<a name="line.61"></a>
+<FONT color="green">062</FONT>      public static int[] keysFor(int modifierMask) {<a name="line.62"></a>
+<FONT color="green">063</FONT>        List&lt;Integer&gt; keyList = new ArrayList&lt;Integer&gt;();<a name="line.63"></a>
+<FONT color="green">064</FONT>        for (Integer mask : MODIFIER_TO_KEY.keySet())<a name="line.64"></a>
+<FONT color="green">065</FONT>          if ((modifierMask &amp; mask.intValue()) != 0) keyList.add(MODIFIER_TO_KEY.get(mask));<a name="line.65"></a>
+<FONT color="green">066</FONT>        int keyCount = keyList.size();<a name="line.66"></a>
+<FONT color="green">067</FONT>        int[] keys = new int[keyCount];<a name="line.67"></a>
+<FONT color="green">068</FONT>        for (int i = 0; i &lt; keyCount; i++) keys[i] = keyList.get(i);<a name="line.68"></a>
+<FONT color="green">069</FONT>        return keys;<a name="line.69"></a>
+<FONT color="green">070</FONT>      }<a name="line.70"></a>
+<FONT color="green">071</FONT>    <a name="line.71"></a>
+<FONT color="green">072</FONT>      /**<a name="line.72"></a>
+<FONT color="green">073</FONT>       * Indicates whether the given key code is a modifier.<a name="line.73"></a>
+<FONT color="green">074</FONT>       * @param keyCode the given key code.<a name="line.74"></a>
+<FONT color="green">075</FONT>       * @return &lt;code&gt;true&lt;/code&gt; if the given key code is a modifier, &lt;code&gt;false&lt;/code&gt; otherwise.<a name="line.75"></a>
+<FONT color="green">076</FONT>       */<a name="line.76"></a>
+<FONT color="green">077</FONT>      public static boolean isModifier(int keyCode) {<a name="line.77"></a>
+<FONT color="green">078</FONT>        return KEY_TO_MODIFIER.containsKey(keyCode);<a name="line.78"></a>
+<FONT color="green">079</FONT>      }<a name="line.79"></a>
+<FONT color="green">080</FONT>    <a name="line.80"></a>
+<FONT color="green">081</FONT>      /**<a name="line.81"></a>
+<FONT color="green">082</FONT>       * Returns the modifier mask for the given key code.<a name="line.82"></a>
+<FONT color="green">083</FONT>       * @param keyCode the given key code.<a name="line.83"></a>
+<FONT color="green">084</FONT>       * @return the modifier mask for the given key code.<a name="line.84"></a>
+<FONT color="green">085</FONT>       * @throws IllegalArgumentException if the given key code is not a modifier.<a name="line.85"></a>
+<FONT color="green">086</FONT>       */<a name="line.86"></a>
+<FONT color="green">087</FONT>      public static int maskFor(int keyCode) {<a name="line.87"></a>
+<FONT color="green">088</FONT>        Integer key = Integer.valueOf(keyCode);<a name="line.88"></a>
+<FONT color="green">089</FONT>        if (!KEY_TO_MODIFIER.containsKey(key))<a name="line.89"></a>
+<FONT color="green">090</FONT>          throw new IllegalArgumentException(concat("Keycode '", valueOf(keyCode), "' is not a modifier"));<a name="line.90"></a>
+<FONT color="green">091</FONT>        return KEY_TO_MODIFIER.get(key);<a name="line.91"></a>
+<FONT color="green">092</FONT>      }<a name="line.92"></a>
+<FONT color="green">093</FONT>    <a name="line.93"></a>
+<FONT color="green">094</FONT>      /**<a name="line.94"></a>
+<FONT color="green">095</FONT>       * Updates the given modifier mask with the given key code, only if the given key code belongs to a modifier key.<a name="line.95"></a>
+<FONT color="green">096</FONT>       * @param keyCode the given key code.<a name="line.96"></a>
+<FONT color="green">097</FONT>       * @param modifierMask the given modifier mask.<a name="line.97"></a>
+<FONT color="green">098</FONT>       * @return the updated modifier mask.<a name="line.98"></a>
+<FONT color="green">099</FONT>       */<a name="line.99"></a>
+<FONT color="green">100</FONT>      public static int updateModifierWithKeyCode(int keyCode, int modifierMask) {<a name="line.100"></a>
+<FONT color="green">101</FONT>        int updatedModifierMask = modifierMask;<a name="line.101"></a>
+<FONT color="green">102</FONT>        for (Map.Entry&lt;Integer, Integer&gt; entry : MODIFIER_TO_KEY.entrySet()) {<a name="line.102"></a>
+<FONT color="green">103</FONT>          if (entry.getValue().intValue() != keyCode) continue;<a name="line.103"></a>
+<FONT color="green">104</FONT>          updatedModifierMask |= entry.getKey().intValue();<a name="line.104"></a>
+<FONT color="green">105</FONT>          break;<a name="line.105"></a>
+<FONT color="green">106</FONT>        }<a name="line.106"></a>
+<FONT color="green">107</FONT>        return updatedModifierMask;<a name="line.107"></a>
+<FONT color="green">108</FONT>      }<a name="line.108"></a>
+<FONT color="green">109</FONT>    <a name="line.109"></a>
+<FONT color="green">110</FONT>      private Modifiers() {}<a name="line.110"></a>
+<FONT color="green">111</FONT>    }<a name="line.111"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>

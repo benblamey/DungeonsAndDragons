@@ -1,0 +1,156 @@
+<HTML>
+<BODY BGCOLOR="white">
+<PRE>
+<FONT color="green">001</FONT>    /*<a name="line.1"></a>
+<FONT color="green">002</FONT>     * Created on Jan 31, 2008<a name="line.2"></a>
+<FONT color="green">003</FONT>     *<a name="line.3"></a>
+<FONT color="green">004</FONT>     * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with<a name="line.4"></a>
+<FONT color="green">005</FONT>     * the License. You may obtain a copy of the License at<a name="line.5"></a>
+<FONT color="green">006</FONT>     *<a name="line.6"></a>
+<FONT color="green">007</FONT>     * http://www.apache.org/licenses/LICENSE-2.0<a name="line.7"></a>
+<FONT color="green">008</FONT>     *<a name="line.8"></a>
+<FONT color="green">009</FONT>     * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on<a name="line.9"></a>
+<FONT color="green">010</FONT>     * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the<a name="line.10"></a>
+<FONT color="green">011</FONT>     * specific language governing permissions and limitations under the License.<a name="line.11"></a>
+<FONT color="green">012</FONT>     *<a name="line.12"></a>
+<FONT color="green">013</FONT>     * Copyright @2008-2010 the original author or authors.<a name="line.13"></a>
+<FONT color="green">014</FONT>     */<a name="line.14"></a>
+<FONT color="green">015</FONT>    package org.fest.swing.driver;<a name="line.15"></a>
+<FONT color="green">016</FONT>    <a name="line.16"></a>
+<FONT color="green">017</FONT>    import static org.fest.swing.driver.JPopupMenuElementsAsTextQuery.menuElementsAsText;<a name="line.17"></a>
+<FONT color="green">018</FONT>    <a name="line.18"></a>
+<FONT color="green">019</FONT>    import java.awt.Container;<a name="line.19"></a>
+<FONT color="green">020</FONT>    <a name="line.20"></a>
+<FONT color="green">021</FONT>    import javax.swing.JMenuItem;<a name="line.21"></a>
+<FONT color="green">022</FONT>    import javax.swing.JPopupMenu;<a name="line.22"></a>
+<FONT color="green">023</FONT>    <a name="line.23"></a>
+<FONT color="green">024</FONT>    import org.fest.swing.annotation.RunsInEDT;<a name="line.24"></a>
+<FONT color="green">025</FONT>    import org.fest.swing.core.GenericTypeMatcher;<a name="line.25"></a>
+<FONT color="green">026</FONT>    import org.fest.swing.core.Robot;<a name="line.26"></a>
+<FONT color="green">027</FONT>    import org.fest.swing.exception.ComponentLookupException;<a name="line.27"></a>
+<FONT color="green">028</FONT>    <a name="line.28"></a>
+<FONT color="green">029</FONT>    /**<a name="line.29"></a>
+<FONT color="green">030</FONT>     * Understands functional testing of &lt;code&gt;{@link JPopupMenu}&lt;/code&gt;s:<a name="line.30"></a>
+<FONT color="green">031</FONT>     * &lt;ul&gt;<a name="line.31"></a>
+<FONT color="green">032</FONT>     * &lt;li&gt;user input simulation&lt;/li&gt;<a name="line.32"></a>
+<FONT color="green">033</FONT>     * &lt;li&gt;state verification&lt;/li&gt;<a name="line.33"></a>
+<FONT color="green">034</FONT>     * &lt;li&gt;property value query&lt;/li&gt;<a name="line.34"></a>
+<FONT color="green">035</FONT>     * &lt;/ul&gt;<a name="line.35"></a>
+<FONT color="green">036</FONT>     * This class is intended for internal use only. Please use the classes in the package<a name="line.36"></a>
+<FONT color="green">037</FONT>     * &lt;code&gt;{@link org.fest.swing.fixture}&lt;/code&gt; in your tests.<a name="line.37"></a>
+<FONT color="green">038</FONT>     *<a name="line.38"></a>
+<FONT color="green">039</FONT>     * @author Yvonne Wang<a name="line.39"></a>
+<FONT color="green">040</FONT>     * @author Alex Ruiz<a name="line.40"></a>
+<FONT color="green">041</FONT>     */<a name="line.41"></a>
+<FONT color="green">042</FONT>    public class JPopupMenuDriver extends JComponentDriver {<a name="line.42"></a>
+<FONT color="green">043</FONT>    <a name="line.43"></a>
+<FONT color="green">044</FONT>      /**<a name="line.44"></a>
+<FONT color="green">045</FONT>       * Creates a new &lt;/code&gt;{@link JPopupMenuDriver}&lt;/code&gt;.<a name="line.45"></a>
+<FONT color="green">046</FONT>       * @param robot the robot to use to simulate user input.<a name="line.46"></a>
+<FONT color="green">047</FONT>       */<a name="line.47"></a>
+<FONT color="green">048</FONT>      public JPopupMenuDriver(Robot robot) {<a name="line.48"></a>
+<FONT color="green">049</FONT>        super(robot);<a name="line.49"></a>
+<FONT color="green">050</FONT>      }<a name="line.50"></a>
+<FONT color="green">051</FONT>    <a name="line.51"></a>
+<FONT color="green">052</FONT>      /**<a name="line.52"></a>
+<FONT color="green">053</FONT>       * Returns the contents of the pop-up menu as a &lt;code&gt;String&lt;/code&gt; array.<a name="line.53"></a>
+<FONT color="green">054</FONT>       * @param popupMenu the target &lt;code&gt;JPopupMenu&lt;/code&gt;.<a name="line.54"></a>
+<FONT color="green">055</FONT>       * @return the contents of the pop-up menu as a &lt;code&gt;String&lt;/code&gt; array.<a name="line.55"></a>
+<FONT color="green">056</FONT>       */<a name="line.56"></a>
+<FONT color="green">057</FONT>      @RunsInEDT<a name="line.57"></a>
+<FONT color="green">058</FONT>      public String[] menuLabelsOf(JPopupMenu popupMenu) {<a name="line.58"></a>
+<FONT color="green">059</FONT>        return menuElementsAsText(popupMenu);<a name="line.59"></a>
+<FONT color="green">060</FONT>      }<a name="line.60"></a>
+<FONT color="green">061</FONT>    <a name="line.61"></a>
+<FONT color="green">062</FONT>      /**<a name="line.62"></a>
+<FONT color="green">063</FONT>       * Finds a &lt;code&gt;{@link JMenuItem}&lt;/code&gt;, contained in the &lt;code&gt;{@link Container}&lt;/code&gt;, which name matches<a name="line.63"></a>
+<FONT color="green">064</FONT>       * the specified one.<a name="line.64"></a>
+<FONT color="green">065</FONT>       * @param popupMenu the target &lt;code&gt;JPopupMenu&lt;/code&gt;.<a name="line.65"></a>
+<FONT color="green">066</FONT>       * @param name the name to match.<a name="line.66"></a>
+<FONT color="green">067</FONT>       * @return the &lt;code&gt;JMenuItem&lt;/code&gt; found.<a name="line.67"></a>
+<FONT color="green">068</FONT>       * @throws ComponentLookupException if a &lt;code&gt;JMenuItem&lt;/code&gt; having a matching name could not be found.<a name="line.68"></a>
+<FONT color="green">069</FONT>       * @throws ComponentLookupException if more than one &lt;code&gt;JMenuItem&lt;/code&gt; having a matching name is found.<a name="line.69"></a>
+<FONT color="green">070</FONT>       */<a name="line.70"></a>
+<FONT color="green">071</FONT>      @RunsInEDT<a name="line.71"></a>
+<FONT color="green">072</FONT>      public JMenuItem menuItem(JPopupMenu popupMenu, String name) {<a name="line.72"></a>
+<FONT color="green">073</FONT>        return robot.finder().findByName(popupMenu, name, JMenuItem.class, false);<a name="line.73"></a>
+<FONT color="green">074</FONT>      }<a name="line.74"></a>
+<FONT color="green">075</FONT>    <a name="line.75"></a>
+<FONT color="green">076</FONT>      /**<a name="line.76"></a>
+<FONT color="green">077</FONT>       * Finds a &lt;code&gt;{@link JMenuItem}&lt;/code&gt;, contained in the &lt;code&gt;{@link Container}&lt;/code&gt;, that matches the<a name="line.77"></a>
+<FONT color="green">078</FONT>       * specified search criteria.<a name="line.78"></a>
+<FONT color="green">079</FONT>       * @param popupMenu the target &lt;code&gt;JPopupMenu&lt;/code&gt;.<a name="line.79"></a>
+<FONT color="green">080</FONT>       * @param matcher contains the search criteria for finding a &lt;code&gt;JMenuItem&lt;/code&gt;.<a name="line.80"></a>
+<FONT color="green">081</FONT>       * @return the &lt;code&gt;JMenuItem&lt;/code&gt; found.<a name="line.81"></a>
+<FONT color="green">082</FONT>       * @throws ComponentLookupException if a &lt;code&gt;JMenuItem&lt;/code&gt; that matches the given search criteria could not be<a name="line.82"></a>
+<FONT color="green">083</FONT>       * found.<a name="line.83"></a>
+<FONT color="green">084</FONT>       * @throws ComponentLookupException if more than one &lt;code&gt;JMenuItem&lt;/code&gt; that matches the given search criteria<a name="line.84"></a>
+<FONT color="green">085</FONT>       * is found.<a name="line.85"></a>
+<FONT color="green">086</FONT>       */<a name="line.86"></a>
+<FONT color="green">087</FONT>      public JMenuItem menuItem(JPopupMenu popupMenu, GenericTypeMatcher&lt;? extends JMenuItem&gt; matcher) {<a name="line.87"></a>
+<FONT color="green">088</FONT>        return robot.finder().find(popupMenu, matcher);<a name="line.88"></a>
+<FONT color="green">089</FONT>      }<a name="line.89"></a>
+<FONT color="green">090</FONT>    }<a name="line.90"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</PRE>
+</BODY>
+</HTML>
